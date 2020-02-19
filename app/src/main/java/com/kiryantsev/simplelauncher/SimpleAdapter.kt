@@ -3,8 +3,6 @@ package com.kiryantsev.simplelauncher
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import android.graphics.drawable.Drawable
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,13 +24,19 @@ class SimpleAdapter(var context: Context, var pm: PackageManager) :
     override fun getItemCount(): Int = list.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as SimpleViewHolder).setImage(list[position].loadIcon(pm))
+        (holder as SimpleViewHolder).fill(list[position],pm)
     }
 
 
     class SimpleViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
-        fun setImage(icon: Drawable?) {
-            view.findViewById<ImageView>(R.id.image).setImageDrawable(icon)
+        fun fill(info: ResolveInfo, pm: PackageManager) {
+            view.findViewById<ImageView>(R.id.image)
+                .apply {
+                    setImageDrawable(info.loadIcon(pm))
+                    setOnClickListener {
+                        context.startActivity(pm.getLaunchIntentForPackage(info.activityInfo.processName))
+                    }
+                }
         }
     }
 
